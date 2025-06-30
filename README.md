@@ -1,130 +1,99 @@
-# Wayflyer frontend take-home project
+# Optimistic ToDos - A React Experiment with Optimistic Updates
 
-First of all - thank you for your interest in Wayflyer, and for taking the time to engage with this process. Your challenge today, should you choose to accept it, concerns **optimistic updates**.
+A React-based todo application that explores the challenges and solutions of implementing optimistic updates in real-world scenarios. This project demonstrates how to handle out-of-order server responses while maintaining a smooth user experience.
 
-<aside>
-Recommended time: 3 hours
-</aside>
+## The Challenge
 
-## The problem
+This project tackles a common real-world problem: **optimistic updates with unreliable network responses**. The application allows users to:
 
-You are working on a ground-breaking new product that will revolutionise human productivity - a *Todo List*. But this one has a key differentiator that will no doubt result in investors falling over themselves to jump aboard: **you cannot ever add or remove from the list**.
+- Reorder todos via drag and drop
+- Toggle todo completion status
+- Experience immediate UI feedback while handling slow, out-of-order server responses
 
-You get an opinionated static list of things todo, and you may re-order them, and mark them as “done”, but that’s it.
+The core challenge is maintaining a consistent user experience when server responses arrive in a different order than requests were sent, which is a realistic scenario in production environments.
 
-Naturally, because you want to get to market quickly, you will use a third-party to manage the actual todos - and that is where the challenge comes in.
+## Key Features
 
-Turns out this service has some quirks, it supports everything you need:
+- **Optimistic Updates**: Immediate UI feedback for all user actions
+- **Drag & Drop Reordering**: Smooth reordering with visual feedback
+- **Out-of-Order Response Handling**: Robust handling of server responses that arrive in unexpected order
+- **TypeScript**: Full type safety throughout the application
+- **React Query**: Efficient data fetching and caching with TanStack Query
+- **Modern React**: Built with React 19 and latest patterns
 
-- Getting a list of todos
-- Toggling the “done” state of a todo
-- Updating the order of todos
+## Technical Implementation
 
-But unfortunately, the response time is slow, and somewhat erratic. Several requests within a small time window to update the order of todos will often result in the responses coming back out of order.
+### Optimistic Update Strategy
 
-## Requirements
+The application implements a sophisticated optimistic update system that:
 
-- A reusable list / grid component that supports re-ordering, and is agnostic about where the data comes from.
-- Management of optimistic updates for drag/drop re-ordering, with the server response(s) acting as the source of truth (remember they can be received out of order)
-- Some sort of visual indication of “done” / “not done” state and a means to toggle this state. This state should also be updated optimistically.
-- A user that drags and drops to re-order quickly (more than one every 3 secs), should not see any unexpected re-ordering as late responses come in.
+1. **Immediately updates the UI** when users perform actions
+2. **Queues server requests** and tracks their order
+3. **Handles out-of-order responses** by maintaining request metadata
+4. **Reconciles conflicts** when server state differs from optimistic state
 
-## Guarantees
+### Architecture
 
-- You can assume that the server processes each request in the order they are sent. Only the responses can be out of order
-- The order array will always have the same length as the total count of todos
+- **Frontend**: React 19 + TypeScript + Vite
+- **State Management**: TanStack Query for server state
+- **Styling**: CSS with modern layout techniques
+- **Backend**: Hono server with simulated network delays
 
-## The API
+## API Endpoints
 
-`GET https://localhost:8123/todos`
+The application communicates with a local server that simulates real-world network conditions:
 
-Returns a list of todos, along with their order
+- `GET /todos` - Fetch todos with their current order
+- `PUT /todos-order` - Update todo ordering
+- `PUT /todos/:id` - Toggle todo completion status
 
-```tsx
-type TodosResponse = {
-   todos: Array<{
-	   id: number;
-	   title: string;
-	   body: string;
-	   done: boolean;
-	   imageUrl: string;
-	}>
-   order: Array<number>
-}
-```
+## Getting Started
 
-`PUT https://localhost:8123/todos-order`
+1. Install dependencies:
 
-Updates the order of the todos, responds with the new order
+   ```bash
+   pnpm install
+   ```
 
-```tsx
-type TodosOrderRequestBody = {
-   order: Array<number>
-}
+2. Start the development servers:
+   ```bash
+   pnpm dev
+   ```
 
-type TodosOrderResponse = {
-   order: Array<number>
-}
-```
+This will start both the backend server (port 8123) and the frontend development server.
 
-`PUT https://localhost:8123/todos/<id>`
+## Learning Goals
 
-Updates a single todo, only accepts boolean `done` state. Responds with updated todo.
+This project explores several important concepts in modern web development:
 
-```tsx
-type TodosOrderRequestBody = {
-   done: boolean
-}
+- **Optimistic UI patterns** and their trade-offs
+- **Race condition handling** in concurrent operations
+- **Error boundaries** and graceful degradation
+- **TypeScript** best practices for complex state management
+- **React Query** patterns for real-time data synchronization
 
-type TodosOrderResponse = {
-   todo: {
-	   id: number;
-	   title: string;
-	   body: string;
-	   done: boolean;
-	   imageUrl: string;
-	}
-}
-```
-
-## Assessment criteria
-
-This project is primarily intended as jumping-off point to drive the discussion during the technical interview. We are interested in assessing proficiency in the following areas:
-
-- TypeScript
-- React
-- CSS
-- Data-fetching patterns
-- Code-quality
-- UX best practices
-
-You are unlikely to be able to fully demonstrate your abilities through this project in the recommended time. You are free to choose to focus on one or several of these and to lean on libraries or frameworks for the others. You will get a chance to demonstrate your knowledge for these on the call, and also to justify your choice of technologies.
-
-You will not be negatively assessed for:
-
-- Use of frameworks (just be prepared to defend choice, and understand how they work)
-- Using beta / alpha versions of libraries
-- Use of scaffolding tools / boilerplates / starter kits
-- Lack of test coverage
-
-## Scaffolding provided
-
-- A node server that simulates the out-of-order responses, and also throttles responses
-- A Vite React 19 app
-- A frontend data-layer based on `tanstack/react-query`
-- Some basic examples of queries and mutations
-
-You are free to ignore the Vite app, and set up your own from scratch if you prefer.
-You are also free to adjust the server, or fix bugs (hopefully there are none), but the simulated out-of-order / throttled responses must be left intact.
-
-To start the provided project (from the root):
-
+## Project Structure
 
 ```
-pnpm i
-pnpm dev
+src/
+├── components/          # Reusable UI components
+├── queries/            # Data fetching logic
+│   ├── client.ts       # Query client configuration
+│   ├── todos.queries.ts # Read operations
+│   └── todos.mutations.ts # Write operations
+└── types.ts            # TypeScript definitions
 ```
 
-This will start both the Hono server and the Vite dev server
+## Future Enhancements
 
-Good luck, and have fun!
+Potential areas for further exploration:
+
+- Real-time collaboration features
+- Offline support with service workers
+- Advanced conflict resolution strategies
+- Performance optimizations for large lists
+- Accessibility improvements
+
+---
+
+_This project demonstrates how to build resilient, user-friendly applications that handle real-world network conditions gracefully._
