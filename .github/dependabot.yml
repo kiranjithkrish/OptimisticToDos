@@ -1,0 +1,21 @@
+version: 2
+registries:
+  python-codeartifact:
+    type: python-index
+    url: https://wayflyer-849891892665.d.codeartifact.eu-west-1.amazonaws.com/pypi/wayflyer/
+    username: aws
+    password: ${{secrets.DEPENDABOT_CODEARTIFACT_TOKEN}}
+updates:
+- package-ecosystem: pip
+  directory: /
+  schedule:
+    interval: weekly
+  registries:
+  - python-codeartifact
+  insecure-external-code-execution: allow
+  versioning-strategy: increase-if-necessary
+  ignore:
+  - dependency-name: '*'
+    update-types:
+    - version-update:semver-patch
+    - version-update:semver-minor

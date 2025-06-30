@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+body {
+  margin: 0;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
